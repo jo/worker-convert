@@ -1,12 +1,12 @@
 {
-  "name": "worker-generate-thumbnails",
-  "description": "CouchDB Worker which generates image thumbnails.",
+  "name": "worker-convert",
+  "description": "CouchDB Worker which converts images using imagemagick.",
   "author": {
     "name": "Johannes J. Schmidt",
     "url": "http://github.com/jo",
     "email": "schmidt@netzmerk.com"
   },
-  "version": "0.4.5",
+  "version": "0.0.1",
   "dependencies": {
     "request": "*",
     "underscore": "*",

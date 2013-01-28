@@ -1,4 +1,4 @@
-// Worker Generate Thumbnails
+// Worker Convert
 
 var request = require("request");
 var _ = require("underscore");
@@ -9,6 +9,10 @@ var spawn = require('child_process').spawn;
 var Worker = require("couchdb-worker").attachments;
 
 function resize(doc, name, version, options, done) {
+  options || (options = {});
+  options.format || (options.format = 'jpg');
+  options.arguments || (options.arguments = []);
+
   var attachments = doc._attachments || {},
       url = this.server
         + '/' + encodeURIComponent(this.db)
@@ -16,8 +20,8 @@ function resize(doc, name, version, options, done) {
         + '/' + encodeURIComponent(name),
       basename = name.replace(/\..*$/, ''),
       prefix = '/tmp/' + encodeURIComponent(doc._id) + '-' + version  + '-' + basename.replace('/', '-') + '-',
-      suffix = '.jpg',
-      args = ['-', '-thumbnail', options.size, '-colorspace', 'sRGB', prefix + '%04d' + suffix],
+      suffix = '.' + options.format,
+      args = ['-'].concat(options.arguments).concat([prefix + '%04d' + suffix]);
       convert = spawn('convert', args);
 
   convert.stderr.pipe(process.stderr);
@@ -35,7 +39,7 @@ function resize(doc, name, version, options, done) {
       filename = prefix + String('0000' + i).slice(-4) + suffix;
 
       attachments[version + '/' + basename + String('0000' + i).slice(-4) + suffix] = {
-        content_type: 'image/jpeg',
+        content_type: 'image/' + options.format,
         data: fs.readFileSync(filename).toString('base64')
       };
       fs.unlinkSync(filename);
@@ -49,14 +53,18 @@ function resize(doc, name, version, options, done) {
   request(url).pipe(convert.stdin);
 }
 
-var formats = ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff', 'bmp', 'svg'];
 var config = {
-  name: 'generate-thumbnails',
+  name: 'convert',
   server: process.env.COUCH_SERVER || "http://127.0.0.1:5984",
   defaults: {
+    formats: ['jpg', 'jpeg', 'png', 'gif', 'tif', 'tiff', 'bmp', 'svg'],
     versions: {
-      thumbnails: {
-        size: '200x300'
+      thumbnail: {
+        format: 'jpg',
+        arguments: [
+          '-thumbnail', '135x135',
+          '-colorspace', 'sRGB'
+        ]
       }
     }
   },
@@ -67,17 +75,17 @@ var config = {
       // ignore own folders by version name
       return  !_.any(_.keys(this.config.versions), function(version) { return version === folder; })
         // only process formats we know
-        && formats.indexOf(name.toLowerCase().replace(/^.*\.([^\.]+)$/, '$1')) > -1;
+        && this.config.formats.indexOf(name.toLowerCase().replace(/^.*\.([^\.]+)$/, '$1')) > -1;
     },
     process: function(doc, name, done) {
       var cnt = _.size(this.config.versions);
 
-      _.each(this.config.versions, function(config, version) {
+      _.each(this.config.versions, function(options, version) {
         var attachments = doc._attachments || {};
 
         this._log('render ' + doc._id + '/' + version + '/' + name);
 
-        resize.call(this, doc, name, version, config, function(code, attachment) {
+        resize.call(this, doc, name, version, options, function(code, attachment) {
           if (code !== 0) {
             console.warn("error in `convert`")
             this._log('error ' + doc._id + '/' + version + '/' + name);
