@@ -1,6 +1,6 @@
 {
   "name": "worker-convert",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "CouchDB Worker which converts images using imagemagick.",
   "keywords": ["CouchDB", "attchments", "worker", "convert", "imagemagick", "image"],
   "homepage": "https://github.com/null2/worker-convert",
