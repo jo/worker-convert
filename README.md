@@ -29,8 +29,12 @@ A Worker Configuration File might look like this:
         "thumbnail": {
           "format": "png",
           "arguments": [
-            "-thumbnail", "135x135",
-            "-colorspace", "sRGB"
+            "-resize", "135x135",
+            "-quality", "75",
+            "-unsharp", "0",
+            "-colorspace", "sRGB",
+            "-interlace", "Plane",
+            "-strip"
           ]
         }
       }
@@ -51,7 +55,7 @@ Each version can specify a target `format`, `png` in that case,
 and can specify individual `arguments`, which must be an array containing
 the arguments passed to imagemagick. The `convert` invocation in this case would look like
 
-    convert image.jpg -thumbnail 135x135 -colorspace sRGB outfile.png
+    convert image.jpg -resize 135x135 -quality 75 -unsharp 0 -colorspace sRGB -interlace Plane -strip image%04d.png
 
 
 ## Worker Status Document
