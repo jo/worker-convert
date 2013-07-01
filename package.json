@@ -1,6 +1,6 @@
 {
   "name": "worker-convert",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "CouchDB Worker which converts images using imagemagick.",
   "keywords": ["CouchDB", "attachments", "couchdb-worker", "worker", "convert", "imagemagick", "image"],
   "homepage": "https://github.com/null2/worker-convert",
@@ -20,7 +20,7 @@
   "dependencies": {
     "request": "*",
     "underscore": "*",
-    "couchdb-worker": ">=0.4.3"
+    "couchdb-worker": "~=0.4.3"
   },
   "scripts": {
     "start": "node index.js"
