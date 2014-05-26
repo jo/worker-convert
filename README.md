@@ -2,6 +2,10 @@
 
 This worker converts images with imagemagick.
 
+# Depricated!
+
+Please use [Couchmagick](https://github.com/jo/couchmagick)
+
 
 ## Prerequisites
 
